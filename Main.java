@@ -9,7 +9,7 @@ public class Main {
     private static void learning() {
         Random gen = new Random();
 
-        for(int i = 0; i < 10000; i++) {
+        for(long i = 0; i < 100000; i++) {
             System.out.print("proba numer " + i);
 
             int rand = gen.nextInt(4);
@@ -22,6 +22,18 @@ public class Main {
     public static void main(String [] args) {
         learning();
 
-        System.out.println(network.go(new float[]{1f, 0f, 0f}));
+        System.out.println("010" + network.go(new float[]{0f, 1f, 0f}));
+        System.out.println("110" + network.go(new float[]{1f, 1f, 0f}));
+        System.out.println("100" + network.go(new float[]{1f, 0f, 0f}));
+        System.out.println("001" + network.go(new float[]{0f, 0f, 1f}));
+    }
+
+    static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
 }

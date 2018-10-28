@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import static java.lang.Math.abs;
 
 class NN {
     private ArrayList<ArrayList<Neuron>> neurons = new ArrayList<>();
@@ -14,29 +15,20 @@ class NN {
     }
 
     void evolve(float[] input, float[] desiredOutput) {
-        clear();
-
-        int i = 0;
-        for(Neuron neuron : neurons.get(0)) {
-            neuron.put(input[i++]);
-        }
-
-        run();
+        run(input);
 
         float learnRate = 0.02f;
 
         for(int j = 0; j < neurons.get(neurons.size()-1).size(); j++) {
-            float localCost = (neurons.get(neurons.size()-1).get(j).getValue() - desiredOutput[j]) *
-                    (neurons.get(neurons.size()-1).get(j).getValue() - desiredOutput[j]);
 
             for(int k = 0; k < neurons.get(neurons.size()-2).size(); k++) {
+                float localCost = Math.abs(neurons.get(neurons.size()-1).get(j).getValue() - desiredOutput[j]);
 
                 neurons.get(neurons.size()-2).get(k).changeWeight(j, learnRate);
 
-                run();
+                run(input);
 
-                float newCost = (neurons.get(neurons.size()-1).get(j).getValue() - desiredOutput[j]) *
-                        (neurons.get(neurons.size()-1).get(j).getValue() - desiredOutput[j]);
+                float newCost = Math.abs(neurons.get(neurons.size()-1).get(j).getValue() - desiredOutput[j]);
 
                 if(newCost < localCost) {
                     continue;
@@ -44,10 +36,10 @@ class NN {
 
                 neurons.get(neurons.size()-2).get(k).changeWeight(j, -2* learnRate);
 
-                run();
 
-                newCost = (neurons.get(neurons.size()-1).get(j).getValue() - desiredOutput[j]) *
-                        (neurons.get(neurons.size()-1).get(j).getValue() - desiredOutput[j]);
+                run(input);
+
+                newCost = Math.abs(neurons.get(neurons.size()-1).get(j).getValue() - desiredOutput[j]);
 
                 if(newCost < localCost) {
                     continue;
@@ -58,14 +50,19 @@ class NN {
         }
     }
 
-    private void run() {
+    private void run(float[] input) {
+        clear();
+
+        for (int i = 0; i < neurons.get(0).size(); i++) {
+            neurons.get(0).get(i).setValue(input[i]);
+        }
+
         for(int i = 0; i < neurons.size()-1; i++) {
             for(int j = 0; j < neurons.get(i).size(); j++) {
                 for(int k = 0; k < neurons.get(i+1).size(); k++) {
-                    neurons.get(i+1).get(k).setValue(
+                   neurons.get(i+1).get(k).setValue(
                             neurons.get(i+1).get(k).getValue() +
-                                    (neurons.get(i).get(j).getValue() * neurons.get(i).get(j).getWeights().get(k)
-                                    + neurons.get(i).get(j).getBias())
+                                    (neurons.get(i).get(j).getValue() * neurons.get(i).get(j).getWeights().get(k))
                     );
                 }
             }
@@ -85,14 +82,7 @@ class NN {
     }
 
     ArrayList<Float> go(float[] input) {
-        clear();
-
-        int i = 0;
-        for(Neuron neuron : neurons.get(0)) {
-            neuron.put(input[i++]);
-        }
-
-        run();
+        run(input);
 
         ArrayList<Float> output = new ArrayList<>();
 
@@ -103,8 +93,10 @@ class NN {
         return output;
     }
 
-    private float sigmoid(float x) {
-        return (float) (1 / (1 + Math.exp(-x)));
+
+
+    float sigmoid(float x) {
+        return (float) Main.round((4*x)/(1+ abs(4*x)), 5);
     }
 }
 
@@ -142,6 +134,6 @@ class Neuron {
 
 
     void changeWeight(int j, float learnRate) {
-        weights.set(j, weights.get(j)+learnRate);
+        weights.set(j, (float) Main.round(weights.get(j)+learnRate, 5));
     }
 }
