@@ -1,5 +1,5 @@
 from PIL import Image
-from cmath import log
+from math import log, exp
 from random import *
 
 
@@ -42,8 +42,8 @@ def derivative_of_ReLU(x: float) -> float:
         return 0.1
 
 
-def sigmoid(x: float or int) -> float or int:  # some combination of sigmoid and ReLU functions
-    return max((1 / (1 + pow(2, -x))) * 2 - 1, 0)
+def sigmoid(x: float) -> float:
+    return 1 / (1 + exp(-x))
 
 
 def derivative_of_sigmoid(x: float) -> float:  # derivative of the sigmoid function
