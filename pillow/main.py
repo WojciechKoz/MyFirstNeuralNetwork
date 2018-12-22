@@ -32,7 +32,7 @@ def test_numbers(images, labels):
 
 
 def text_xor():
-    NN = NeuralNetwork(3, [2, 3, 1])
+    NN = NeuralNetwork(3, [2, 2, 1])
 
     for i in range(0, 10000):
         input = [random.randrange(0, 2), random.randrange(0, 2)]
@@ -56,10 +56,13 @@ def text_xor():
 
         NN.backpropagation(desired_output)
 
-    for layer in NN.neurons:
-        for neuron in layer:
-            print(str(neuron.value) + ": " + str(neuron.bias))
-            print(neuron.weights)
+    NN.change_weights_manually([[],
+                                [[0.1, 0.2], [0.3, 0.4]],
+                                [[0.5, 0.6]]])
+
+    NN.change_biases_manually([[0, 0], [0.2, 0.3], [0.5]])
+
+    NN.show_all_parameters()
 
 
 def main():
@@ -69,9 +72,6 @@ def main():
     # test_numbers(images, labels)
 
     text_xor()
-
-    for i in range(3, 0, -1):
-        print(i)
 
 
 if __name__ == "__main__":

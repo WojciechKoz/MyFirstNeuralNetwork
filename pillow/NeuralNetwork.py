@@ -29,6 +29,26 @@ class NeuralNetwork:
         for i in range(1, number_of_layers):
             layer_init(i, number_of_neurons[i], number_of_neurons[i-1])  # create hidden and output layers
 
+    def change_weights_manually(self, values: list) -> None:
+        for layer_values, layer in zip(values, self.neurons):
+            for values, neuron in zip(layer_values, layer):
+                neuron.weights = values
+
+    def change_biases_manually(self, values: list):
+        for v_layer, layer in zip(values, self.neurons):
+            for value, neuron in zip(v_layer, layer):
+                neuron.bias = value
+
+    def show_all_parameters(self):
+        for nr_layer, layer in enumerate(self.neurons):
+            print("layer number:" + str(nr_layer))
+            for n, neuron in enumerate(layer):
+                print("neuron number: " + str(n))
+                print("value: " + str(neuron.value) + ", bias: " + str(neuron.bias))
+                print("weights:")
+                print(neuron.weights)
+                print()
+
     def fill_first_layer(self, data):
         for neuron, value in zip(self.neurons[0], data):
             neuron.value = value
