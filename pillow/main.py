@@ -34,8 +34,8 @@ def test_numbers(images, labels):
 def text_xor():
     NN = NeuralNetwork(3, [2, 2, 1])
 
-    for i in range(0, 1000):
-        input = [random.randrange(0, 1), random.randrange(1, 2)]
+    for i in range(0, 100000):
+        input = [random.randrange(0, 2), random.randrange(0, 2)]
 
         if input[0] == input[1]:
             desired_output = [0]

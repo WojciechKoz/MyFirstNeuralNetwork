@@ -67,30 +67,29 @@ class NeuralNetwork:
         return 2*(desired_output - neuron.value)
 
     def backpropagation(self, desired_output: list) -> None:
-        for index, layer in reversed(list(enumerate(self.neurons))):  # we start from the end and go to the first layer
-            if index == 0:  # first layer ends the backpropagation algorithm
-                break
+            # first step of back prop is to calculate δ of each neuron
 
-            next_desired_output = neuron_values(self.neurons[index - 1])  # at the beginning set next desired values
-            # list
+            # output layer
+            for neuron, desired_value in zip(self.neurons[-1], desired_output):
+                neuron.δ = derivative_of_sigmoid(desired_value - neuron.z)  # take raw sum (z) to calculate δ
 
-            for num, neuron in enumerate(layer):  # for each neurons in this layer change bias and every
-                # weights and value of neurons in previous layer
+            # hidden layers
+            for i in range(len(self.neurons) - 2, 0):  # for each hidden layer
+                for n, neuron in enumerate(self.neurons[i]):  # for each neuron in this layer
+                    for neuron_in_next_layer in self.neurons[i+1]:  # for each neuron in next layer
+                        neuron.δ += neuron_in_next_layer.δ * \
+                                    neuron_in_next_layer.weights[n] * derivative_of_sigmoid(neuron.z)  # adding up
+                        # δ of next neurons , weights connected with this neuron and sigma'(z)
+                    neuron.δ = derivative_of_sigmoid(neuron.δ)  # not sure if it's needed
 
-                cost = self.derivative_of_cost(desired_output[num], neuron)
+            # second step is to change weights and biases
 
-                neuron.bias += 1 * derivative_of_ReLU(neuron.z) * cost * self.learn_rate
-                # we don't care about good order because we don't change values of neurons
-                # and we don't change value of some weight twice so output stay the same
+            for i, layer in reversed(list(enumerate(self.neurons))):
+                for neuron in layer:
+                    neuron.bias += self.learn_rate * neuron.δ
 
-                for i, (weight, previous_neuron) in enumerate(zip(neuron.weights, self.neurons[index-1])):
-                    weight += previous_neuron.value * cost * derivative_of_ReLU(previous_neuron.z) * self.learn_rate
-
-                    if index != 1:  # second layer can't change value of previous layer
-                        next_desired_output[i] += weight * cost * derivative_of_ReLU(previous_neuron.z) * self.learn_rate
-
-            desired_output = next_desired_output  # at the end of the layer swap this two list now we take care of the
-            # next layer
+                    for prev_neuron, weight in zip(self.neurons[i-1], neuron.weights):
+                        weight += self.learn_rate * neuron.δ * prev_neuron.value
 
 
 class Neuron:
@@ -98,16 +97,19 @@ class Neuron:
     z = 0  # value of sum of every neurons from previous layer multiples by weights (before ReLU)
     bias = 0
     weights = []  # list of numbers represents weights connected to this neuron (from the left)
+    δ = 0
 
     def __init__(self, bias, weights):
         self.value = 0
         self.bias = bias
         self.weights = weights
         self.z = 0
+        self.δ = 0
 
     def clear(self):
         self.value = 0
         self.z = 0
+        self.δ = 0
 
     def calculate(self, previous_layer):
         for element, weight in zip(previous_layer, self.weights):
