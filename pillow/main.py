@@ -32,9 +32,9 @@ def test_numbers(images, labels):
 
 
 def text_xor():
-    NN = NeuralNetwork(3, [2, 2, 1])
+    NN = NeuralNetwork(3, [2, 3, 1])
 
-    for i in range(0, 100000):
+    for i in range(0, 10000):
         input = [random.randrange(0, 2), random.randrange(0, 2)]
 
         if input[0] == input[1]:
@@ -69,6 +69,9 @@ def main():
     # test_numbers(images, labels)
 
     text_xor()
+
+    for i in range(3, 0, -1):
+        print(i)
 
 
 if __name__ == "__main__":

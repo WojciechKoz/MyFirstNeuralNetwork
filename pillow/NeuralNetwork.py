@@ -74,7 +74,7 @@ class NeuralNetwork:
                 neuron.δ = derivative_of_sigmoid(desired_value - neuron.z)  # take raw sum (z) to calculate δ
 
             # hidden layers
-            for i in range(len(self.neurons) - 2, 0):  # for each hidden layer
+            for i in range(len(self.neurons) - 2, 0, -1):  # for each hidden layer
                 for n, neuron in enumerate(self.neurons[i]):  # for each neuron in this layer
                     for neuron_in_next_layer in self.neurons[i+1]:  # for each neuron in next layer
                         neuron.δ += neuron_in_next_layer.δ * \
@@ -115,4 +115,4 @@ class Neuron:
         for element, weight in zip(previous_layer, self.weights):
             self.z += element.value * weight
 
-        self.value = dying_ReLU(self.z - self.bias)
+        self.value = sigmoid(self.z - self.bias)
