@@ -44,7 +44,7 @@ class NeuralNetwork:
             print("layer number:" + str(nr_layer))
             for n, neuron in enumerate(layer):
                 print("neuron number: " + str(n))
-                print("value: " + str(neuron.value) + ", bias: " + str(neuron.bias))
+                print("value: " + str(neuron.value) + ", bias: " + str(neuron.bias) + ", δ: " + str(neuron.δ))
                 print("weights:")
                 print(neuron.weights)
                 print()
@@ -87,29 +87,29 @@ class NeuralNetwork:
         return 2*(desired_output - neuron.value)
 
     def backpropagation(self, desired_output: list) -> None:
-            # first step of back prop is to calculate δ of each neuron
+        # first step of back prop is to calculate δ of each neuron
 
-            # output layer
-            for neuron, desired_value in zip(self.neurons[-1], desired_output):
-                neuron.δ = derivative_of_sigmoid(desired_value - neuron.z)  # take raw sum (z) to calculate δ
+        # output layer
+        for neuron, desired_value in zip(self.neurons[-1], desired_output):
+            neuron.δ = derivative_of_sigmoid(neuron.z) * (desired_value - neuron.value)  # take raw sum (z) to calculate δ
 
-            # hidden layers
-            for i in range(len(self.neurons) - 2, 0, -1):  # for each hidden layer
-                for n, neuron in enumerate(self.neurons[i]):  # for each neuron in this layer
-                    for neuron_in_next_layer in self.neurons[i+1]:  # for each neuron in next layer
-                        neuron.δ += neuron_in_next_layer.δ * \
-                                    neuron_in_next_layer.weights[n] * derivative_of_sigmoid(neuron.z)  # adding up
-                        # δ of next neurons , weights connected with this neuron and sigma'(z)
-                    neuron.δ = derivative_of_sigmoid(neuron.δ)  # not sure if it's needed
+        # hidden layers
+        for i in range(len(self.neurons) - 2, 0, -1):  # for each hidden layer
+            for n, neuron in enumerate(self.neurons[i]):  # for each neuron in this layer
+                for neuron_in_next_layer in self.neurons[i+1]:  # for each neuron in next layer
+                    neuron.δ += neuron_in_next_layer.δ * \
+                                neuron_in_next_layer.weights[n] * derivative_of_sigmoid(neuron.z)  # adding up
+                    # δ of next neurons , weights connected with this neuron and sigma'(z)
 
-            # second step is to change weights and biases
+        # second step is to change weights and biases
 
-            for i, layer in reversed(list(enumerate(self.neurons))):
-                for neuron in layer:
-                    neuron.bias += self.learn_rate * neuron.δ
+        for i, layer in reversed(list(enumerate(self.neurons))):
+            for neuron in layer:
+                neuron.bias += self.learn_rate * neuron.δ
 
-                    for prev_neuron, weight in zip(self.neurons[i-1], neuron.weights):
-                        weight += self.learn_rate * neuron.δ * prev_neuron.value
+                # for prev_neuron, weight in zip(self.neurons[i-1], neuron.weights):
+                for n in range(0, len(neuron.weights)):
+                    neuron.weights[n] += self.learn_rate * neuron.δ * self.neurons[i-1][n].value
 
 
 class Neuron:
@@ -135,4 +135,4 @@ class Neuron:
         for element, weight in zip(previous_layer, self.weights):
             self.z += element.value * weight
 
-        self.value = sigmoid(self.z - self.bias)
+        self.value = sigmoid(self.z + self.bias)
