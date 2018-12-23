@@ -42,7 +42,7 @@ def text_xor():
 
     NN.show_all_parameters()
 
-    for i in range(0, 1000):
+    for i in range(0, 1000000):
         input = [random.randrange(0, 2), random.randrange(0, 2)]
 
         if input[0] == input[1]:
@@ -63,6 +63,9 @@ def text_xor():
         print()
 
         NN.backpropagation(desired_output)
+
+        if i % 100 == 0:
+            NN.gradient_descent_steps()
 
     NN.show_all_parameters()
 

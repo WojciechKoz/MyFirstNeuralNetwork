@@ -11,7 +11,7 @@ def neuron_values(neurons: list) -> list:
 
 class NeuralNetwork:
     neurons = []  # list of lists of Neuron objects
-    learn_rate = 0.1  # value multiplies by derivatives of some functions
+    learn_rate = 0.2  # value multiplies by derivatives of some functions
 
     def __init__(self, number_of_layers: int, number_of_neurons: list):
         # default constructor create a neuron network with 4 layers: 784, 16, 16, 10 neurons in layer
@@ -86,6 +86,11 @@ class NeuralNetwork:
         # in backprop
         return 2*(desired_output - neuron.value)
 
+    def gradient_descent_steps(self):
+        for layer in self.neurons:
+            for neuron in layer:
+                neuron.gradient_descent_step()
+
     def backpropagation(self, desired_output: list) -> None:
         # first step of back prop is to calculate δ of each neuron
 
@@ -105,11 +110,11 @@ class NeuralNetwork:
 
         for i, layer in reversed(list(enumerate(self.neurons))):
             for neuron in layer:
-                neuron.bias += self.learn_rate * neuron.δ
+                neuron.delta_bias += self.learn_rate * neuron.δ
 
                 # for prev_neuron, weight in zip(self.neurons[i-1], neuron.weights):
                 for n in range(0, len(neuron.weights)):
-                    neuron.weights[n] += self.learn_rate * neuron.δ * self.neurons[i-1][n].value
+                    neuron.delta_weights[n] += self.learn_rate * neuron.δ * self.neurons[i-1][n].value
 
 
 class Neuron:
@@ -117,6 +122,8 @@ class Neuron:
     z = 0  # value of sum of every neurons from previous layer multiples by weights (before ReLU)
     bias = 0
     weights = []  # list of numbers represents weights connected to this neuron (from the left)
+    delta_weights = []
+    delta_bias = 0
     δ = 0
 
     def __init__(self, bias, weights):
@@ -125,6 +132,8 @@ class Neuron:
         self.weights = weights
         self.z = 0
         self.δ = 0
+        self.delta_weights = [0] * len(self.weights)
+        self.delta_bias = 0
 
     def clear(self):
         self.value = 0
@@ -136,3 +145,12 @@ class Neuron:
             self.z += element.value * weight
 
         self.value = sigmoid(self.z + self.bias)
+
+    def gradient_descent_step(self):
+        for i in range(0, len(self.delta_weights)):
+            self.weights[i] += self.delta_weights[i]
+
+        self.bias = self.delta_bias
+
+        self.delta_bias = 0
+        self.delta_weights = [0] * len(self.weights)
