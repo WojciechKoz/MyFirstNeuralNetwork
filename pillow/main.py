@@ -42,7 +42,7 @@ def text_xor():
 
     NN.show_all_parameters()
 
-    for i in range(0, 1000000):
+    for i in range(0, 100000):
         input = [random.randrange(0, 2), random.randrange(0, 2)]
 
         if input[0] == input[1]:

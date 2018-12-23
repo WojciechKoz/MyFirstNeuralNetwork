@@ -148,7 +148,7 @@ class Neuron:
 
     def gradient_descent_step(self):
         for i in range(0, len(self.delta_weights)):
-            self.weights[i] += self.delta_weights[i]
+            self.weights[i] += self.delta_weights[i] / 100.0
 
         self.bias = self.delta_bias
 
