@@ -150,7 +150,7 @@ class Neuron:
         for i in range(0, len(self.delta_weights)):
             self.weights[i] += self.delta_weights[i] / 100.0
 
-        self.bias = self.delta_bias
+        self.bias = self.delta_bias / 100.0
 
         self.delta_bias = 0
         self.delta_weights = [0] * len(self.weights)
