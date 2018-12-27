@@ -1,5 +1,5 @@
 from PIL import Image
-from math import log, exp
+from cmath import log
 from random import *
 
 
@@ -42,12 +42,15 @@ def derivative_of_ReLU(x: float) -> float:
         return 0.1
 
 
-def sigmoid(x: float) -> float:
-    return 1 / (1 + exp(-x))
+def sigmoid(x: float or int) -> float or int:  # some combination of sigmoid and ReLU functions
+    return max((1 / (1 + pow(2, -x))) * 2 - 1, 0)
 
 
-def derivative_of_sigmoid(x: float) -> float:  # derivative of the sigmoid function
-    return sigmoid(x) * (1 - sigmoid(x))
+def derivative_sigmoid(x: float or int) -> float or int:  # derivative of the sigmoid function
+    if x >= 0:
+        return (pow(2, 1 - x) * log(2)) / (1 + pow(2, -x) * (1 + pow(2, -x)))
+    else:
+        return 0
 
 
 def create_random_list(value: int, a: float, b: float) -> list:

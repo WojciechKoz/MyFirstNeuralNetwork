@@ -11,7 +11,7 @@ def neuron_values(neurons: list) -> list:
 
 class NeuralNetwork:
     neurons = []  # list of lists of Neuron objects
-    learn_rate = 0.2  # value multiplies by derivatives of some functions
+    learn_rate = 0.1  # value multiplies by derivatives of some functions
 
     def __init__(self, number_of_layers: int, number_of_neurons: list):
         # default constructor create a neuron network with 4 layers: 784, 16, 16, 10 neurons in layer
@@ -28,26 +28,6 @@ class NeuralNetwork:
 
         for i in range(1, number_of_layers):
             layer_init(i, number_of_neurons[i], number_of_neurons[i-1])  # create hidden and output layers
-
-    def change_weights_manually(self, values: list) -> None:
-        for layer_values, layer in zip(values, self.neurons):
-            for values, neuron in zip(layer_values, layer):
-                neuron.weights = values
-
-    def change_biases_manually(self, values: list):
-        for v_layer, layer in zip(values, self.neurons):
-            for value, neuron in zip(v_layer, layer):
-                neuron.bias = value
-
-    def show_all_parameters(self):
-        for nr_layer, layer in enumerate(self.neurons):
-            print("layer number:" + str(nr_layer))
-            for n, neuron in enumerate(layer):
-                print("neuron number: " + str(n))
-                print("value: " + str(neuron.value) + ", bias: " + str(neuron.bias) + ", δ: " + str(neuron.δ))
-                print("weights:")
-                print(neuron.weights)
-                print()
 
     def fill_first_layer(self, data):
         for neuron, value in zip(self.neurons[0], data):
@@ -86,35 +66,31 @@ class NeuralNetwork:
         # in backprop
         return 2*(desired_output - neuron.value)
 
-    def gradient_descent_steps(self):
-        for layer in self.neurons:
-            for neuron in layer:
-                neuron.gradient_descent_step()
-
     def backpropagation(self, desired_output: list) -> None:
-        # first step of back prop is to calculate δ of each neuron
+        for index, layer in reversed(list(enumerate(self.neurons))):  # we start from the end and go to the first layer
+            if index == 0:  # first layer ends the backpropagation algorithm
+                break
 
-        # output layer
-        for neuron, desired_value in zip(self.neurons[-1], desired_output):
-            neuron.δ = derivative_of_sigmoid(neuron.z) * (desired_value - neuron.value)  # take raw sum (z) to calculate δ
+            next_desired_output = neuron_values(self.neurons[index - 1])  # at the beginning set next desired values
+            # list
 
-        # hidden layers
-        for i in range(len(self.neurons) - 2, 0, -1):  # for each hidden layer
-            for n, neuron in enumerate(self.neurons[i]):  # for each neuron in this layer
-                for neuron_in_next_layer in self.neurons[i+1]:  # for each neuron in next layer
-                    neuron.δ += neuron_in_next_layer.δ * \
-                                neuron_in_next_layer.weights[n] * derivative_of_sigmoid(neuron.z)  # adding up
-                    # δ of next neurons , weights connected with this neuron and sigma'(z)
+            for num, neuron in enumerate(layer):  # for each neurons in this layer change bias and every
+                # weights and value of neurons in previous layer
 
-        # second step is to change weights and biases
+                cost = self.derivative_of_cost(desired_output[num], neuron)
 
-        for i, layer in reversed(list(enumerate(self.neurons))):
-            for neuron in layer:
-                neuron.delta_bias += self.learn_rate * neuron.δ
+                neuron.bias += 1 * derivative_of_ReLU(neuron.z) * cost * self.learn_rate
+                # we don't care about good order because we don't change values of neurons
+                # and we don't change value of some weight twice so output stay the same
 
-                # for prev_neuron, weight in zip(self.neurons[i-1], neuron.weights):
-                for n in range(0, len(neuron.weights)):
-                    neuron.delta_weights[n] += self.learn_rate * neuron.δ * self.neurons[i-1][n].value
+                for i, (weight, previous_neuron) in enumerate(zip(neuron.weights, self.neurons[index-1])):
+                    weight += previous_neuron.value * cost * derivative_of_ReLU(previous_neuron.z) * self.learn_rate
+
+                    if index != 1:  # second layer can't change value of previous layer
+                        next_desired_output[i] += weight * cost * derivative_of_ReLU(previous_neuron.z) * self.learn_rate
+
+            desired_output = next_desired_output  # at the end of the layer swap this two list now we take care of the
+            # next layer
 
 
 class Neuron:
@@ -122,35 +98,19 @@ class Neuron:
     z = 0  # value of sum of every neurons from previous layer multiples by weights (before ReLU)
     bias = 0
     weights = []  # list of numbers represents weights connected to this neuron (from the left)
-    delta_weights = []
-    delta_bias = 0
-    δ = 0
 
     def __init__(self, bias, weights):
         self.value = 0
         self.bias = bias
         self.weights = weights
         self.z = 0
-        self.δ = 0
-        self.delta_weights = [0] * len(self.weights)
-        self.delta_bias = 0
 
     def clear(self):
         self.value = 0
         self.z = 0
-        self.δ = 0
 
     def calculate(self, previous_layer):
         for element, weight in zip(previous_layer, self.weights):
             self.z += element.value * weight
 
-        self.value = sigmoid(self.z + self.bias)
-
-    def gradient_descent_step(self):
-        for i in range(0, len(self.delta_weights)):
-            self.weights[i] += self.delta_weights[i] / 100.0
-
-        self.bias = self.delta_bias / 100.0
-
-        self.delta_bias = 0
-        self.delta_weights = [0] * len(self.weights)
+        self.value = dying_ReLU(self.z - self.bias)

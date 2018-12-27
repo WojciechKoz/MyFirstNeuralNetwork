@@ -34,16 +34,8 @@ def test_numbers(images, labels):
 def text_xor():
     NN = NeuralNetwork(3, [2, 2, 1])
 
-    NN.change_weights_manually([[],
-                                [[0.1, 0.2], [0.3, -0.1]],
-                                [[-0.1, 0.2]]])
-
-    NN.change_biases_manually([[0, 0], [0.2, 0.1], [-0.2]])
-
-    NN.show_all_parameters()
-
-    for i in range(0, 100000):
-        input = [random.randrange(0, 2), random.randrange(0, 2)]
+    for i in range(0, 1000):
+        input = [random.randrange(0, 1), random.randrange(1, 2)]
 
         if input[0] == input[1]:
             desired_output = [0]
@@ -64,10 +56,10 @@ def text_xor():
 
         NN.backpropagation(desired_output)
 
-        if i % 100 == 0:
-            NN.gradient_descent_steps()
-
-    NN.show_all_parameters()
+    for layer in NN.neurons:
+        for neuron in layer:
+            print(str(neuron.value) + ": " + str(neuron.bias))
+            print(neuron.weights)
 
 
 def main():
