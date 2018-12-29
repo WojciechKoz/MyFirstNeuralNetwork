@@ -96,5 +96,10 @@ print(l3)
 for i, el in enumerate(l3):
     print(labels[0][i], "=", np.argmax(el), " predictions: ", el)
 
-for i in range(5000, 5100):
-    print(labels_full[i], predict(images_full[i]))
+testing_images, testing_labels = mndata.load_testing()
+correct = 0.0
+for i, (image, label) in enumerate(zip(testing_images, testing_labels)):
+    prediction = predict(image)
+    if label == prediction:
+        correct += 1.0
+    print("{} = {} (correct {}%)".format(label, prediction, 100 * correct / (i + 1.0)))
