@@ -13,19 +13,23 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
-X = np.array([[0, 0],
-              [0, 1],
-              [1, 0],
-              [1, 1]])
+#X = np.array([[0, 0],
+#              [0, 1],
+#              [1, 0],
+#              [1, 1]])
 
 X = np.array(images)
 
-y = np.array([[0],
-              [1],
-              [1],
-              [0]])
+y = []
+for label in labels:
+    y.append([1.0 if i == label else 0.0 for i in range(10)])
 
-y = np.matrix(labels).T
+y = np.array(y)
+
+#y = np.array([[0],
+#              [1],
+#              [1],
+#              [0]])
 
 np.random.seed(1)
 
@@ -40,8 +44,8 @@ b0 = 2 * np.random.random((1, SIZES[1])) - 1
 b1 = 2 * np.random.random((1, SIZES[2])) - 1
 
 # extend the biases 
-b0 = np.vstack([b0] + [b0[0]] * (LEN - 1))
-b1 = np.vstack([b1] + [b1[0]] * (LEN - 1))
+b0 = np.vstack([b0] + [b0[0]] * (SIZES[0] - 1))
+b1 = np.vstack([b1] + [b1[0]] * (SIZES[1] - 1))
 
 for j in range(500):
     l0 = X
