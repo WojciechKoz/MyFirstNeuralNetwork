@@ -45,16 +45,6 @@ syn1 = 2 * np.random.random((SIZES[1], SIZES[2])) - 1
 b0 = 2 * np.random.random((1, SIZES[1])) - 1
 b1 = 2 * np.random.random((1, SIZES[2])) - 1
 
-# extend the biases 
-b0 = np.vstack([b0] + [b0[0]] * (LEN - 1))
-b1 = np.vstack([b1] + [b1[0]] * (LEN - 1))
-
-def average_rows(b):
-    height = np.shape(b)[0]
-    b = b.mean(axis=0)
-    #print(b)
-    return np.array([b] * height)
-
 for j in range(500):
     l0 = X
     l1 = sigmoid(np.dot(l0, syn0) + b0)
@@ -71,16 +61,14 @@ for j in range(500):
     syn1 += l1.T.dot(l2_delta)
     syn0 += l0.T.dot(l1_delta)
 
-    b0 += l1_delta
-    b0 = average_rows(b0)
-    b1 += l2_delta
-    b1 = average_rows(b1)
+    b0 += l1_delta.mean(axis=0)
+    b1 += l2_delta.mean(axis=0)
 
 
 def predict(data):
     l0 = [data]
-    l1 = sigmoid(np.dot(l0, syn0) + b0[0])
-    l2 = sigmoid(np.dot(l1, syn1) + b1[0])
+    l1 = sigmoid(np.dot(l0, syn0) + b0)
+    l2 = sigmoid(np.dot(l1, syn1) + b1)
     return np.argmax(l2)
 
 print("Output after training: ")
