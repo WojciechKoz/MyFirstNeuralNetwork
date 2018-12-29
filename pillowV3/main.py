@@ -3,10 +3,10 @@ import numpy as np
 from mnist import MNIST
 
 mndata = MNIST('./data')
-images, labels = mndata.load_training()
+images_full, labels_full = mndata.load_training()
 
-images = images[:100]
-labels = labels[:100]
+images = images_full[:100]
+labels = labels_full[:100]
 
 def sigmoid_prime(x):
     return np.exp(-x) / ((np.exp(-x) + 1) ** 2)
@@ -77,5 +77,16 @@ for j in range(500):
     b1 = average_rows(b1)
 
 
+def predict(data):
+    l0 = [data]
+    l1 = sigmoid(np.dot(l0, syn0) + b0[0])
+    l2 = sigmoid(np.dot(l1, syn1) + b1[0])
+    return np.argmax(l2)
+
 print("Output after training: ")
 print(l2)
+for i, el in enumerate(l2):
+    print(labels[i], "=", np.argmax(el), " predictions: ", el)
+
+for i in range(101, 200):
+    print(labels_full[i], predict(images_full[i]))
