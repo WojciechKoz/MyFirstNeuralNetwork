@@ -1,3 +1,5 @@
+from __future__ import print_function # new print() on python2
+from datetime import datetime
 import numpy as np  
 
 from mnist import MNIST
@@ -7,7 +9,7 @@ images_full, labels_full = mndata.load_training()
 images = []
 labels = []
 
-for i in range(50):
+for i in range(60):
     images.append(images_full[i*100 : (i+1)*100])
     labels.append(labels_full[i*100 : (i+1)*100])
 
@@ -53,12 +55,16 @@ b0 = 2 * np.random.random((1, SIZES[1])) - 1
 b1 = 2 * np.random.random((1, SIZES[2])) - 1
 b2 = 2 * np.random.random((1, SIZES[3])) - 1
 
-for i, batch in enumerate(images):
+for i, batch in list(enumerate(images)):
     X = np.array(batch)
     print("x:")
     print(np.shape(X))
+    
+    print("======================= BATCH {} =======================".format(i))
 
-    for j in range(500):
+    error = 1
+    j = 0
+    while error > 0.05 and j < 50:
         l0 = X
         l1 = sigmoid(np.dot(l0, syn0) + b0)
         l2 = sigmoid(np.dot(l1, syn1) + b1)
@@ -66,8 +72,11 @@ for i, batch in enumerate(images):
 
         l3_error = (y[i] - l3)#** 2
 
+        error = np.mean(np.abs(l3_error))
+
+        j += 1
         if j % 20 == 0:
-            print(("[%d] error: " % j) + str(np.mean(np.abs(l3_error))))
+            print(("[%d] error: " % j) + str(error))
 
         l3_delta = l3_error * sigmoid_prime(l3)
         l2_error = l3_delta.dot(syn2.T)
@@ -102,4 +111,19 @@ for i, (image, label) in enumerate(zip(testing_images, testing_labels)):
     prediction = predict(image)
     if label == prediction:
         correct += 1.0
-    print("{} = {} (correct {}%)".format(label, prediction, 100 * correct / (i + 1.0)))
+    correct_rate = correct / (i + 1.0)
+    print("{} = {} (correct {}%)".format(label, prediction, 100 * correct_rate))
+
+with open('log/' + str(datetime.now()), 'a') as f:
+    with open(__file__, 'r') as myself:
+        print(myself.read(), file=f)
+    print("", file=f)
+    print("#### answers:", file=f)
+    print("correct_rate =", correct_rate, file=f)
+    print("SIZES =", SIZES, file=f)
+    print("syn0 =", syn0, file=f)
+    print("syn1 =", syn1, file=f)
+    print("syn2 =", syn2, file=f)
+    print("b0 =", b0, file=f)
+    print("b1 =", b1, file=f)
+    print("b2 =", b2, file=f)
