@@ -1,5 +1,9 @@
 import numpy as np  
 
+from mnist import MNIST
+
+mndata = MNIST('./data')
+images, labels = mndata.load_training()
 
 def sigmoid_prime(x):
     return np.exp(-x) / ((np.exp(-x) + 1) ** 2)
@@ -14,21 +18,30 @@ X = np.array([[0, 0],
               [1, 0],
               [1, 1]])
 
+X = np.array(images)
+
 y = np.array([[0],
               [1],
               [1],
               [0]])
 
+y = np.matrix(labels).T
+
 np.random.seed(1)
 
-syn0 = 2 * np.random.random((2, 4)) - 1  
-syn1 = 2 * np.random.random((4, 1)) - 1 
+LEN = 60000
+SIZES = [ 784, 16, 10 ]
 
-b0 = 2 * np.random.random((1, 4)) - 1
-b1 = 2 * np.random.random((1, 1)) - 1
+syn0 = 2 * np.random.random((SIZES[0], SIZES[1])) - 1  
+syn1 = 2 * np.random.random((SIZES[1], SIZES[2])) - 1 
 
-b0 = np.vstack([b0] + [b0[0]]*3)
-b1 = np.vstack([b1] + [b1[0]]*3)
+# biases for respective layers
+b0 = 2 * np.random.random((1, SIZES[1])) - 1
+b1 = 2 * np.random.random((1, SIZES[2])) - 1
+
+# extend the biases 
+b0 = np.vstack([b0] + [b0[0]] * (LEN - 1))
+b1 = np.vstack([b1] + [b1[0]] * (LEN - 1))
 
 for j in range(500):
     l0 = X
@@ -37,8 +50,7 @@ for j in range(500):
 
     l2_error = (y - l2)#** 2
 
-    if (j % 10000) == 0:
-        print("error: " + str(np.mean(np.abs(l2_error))))
+    print("[%d] error: %d" % (j, np.mean(np.abs(l2_error))))
 
     l2_delta = l2_error * sigmoid_prime(l2)
     l1_error = l2_delta.dot(syn1.T)
