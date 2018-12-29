@@ -5,8 +5,8 @@ from mnist import MNIST
 mndata = MNIST('./data')
 images, labels = mndata.load_training()
 
-images = images[10:]
-labels = labels[10:]
+images = images[:100]
+labels = labels[:100]
 
 def sigmoid_prime(x):
     return np.exp(-x) / ((np.exp(-x) + 1) ** 2)
@@ -52,7 +52,7 @@ b1 = np.vstack([b1] + [b1[0]] * (LEN - 1))
 def average_rows(b):
     height = np.shape(b)[0]
     b = b.mean(axis=0)
-    print(b)
+    #print(b)
     return np.array([b] * height)
 
 for j in range(500):
