@@ -1,17 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf8 -*-
 from __future__ import print_function # new print() on python2
 from datetime import datetime
+import sys
 import numpy as np  
 
 from mnist import MNIST
+
+# Display full arrays
+np.set_printoptions(threshold=np.inf)
 
 mndata = MNIST('./data')
 images_full, labels_full = mndata.load_training()
 images = []
 labels = []
 
-for i in range(60):
-    images.append(images_full[i*100 : (i+1)*100])
-    labels.append(labels_full[i*100 : (i+1)*100])
+# dynamic arguments
+batch_size = int(sys.argv[1])
+size_1 = int(sys.argv[2])
+size_2 = int(sys.argv[3])
+batch_training_size = int(sys.argv[4])
+
+data_part = 5 # only one fifth of the whole dataset to speed up training
+
+for i in range(len(labels_full) // batch_size // data_part):
+    images.append(images_full[i*batch_size : (i+1)*batch_size])
+    labels.append(labels_full[i*batch_size : (i+1)*batch_size])
 
 def sigmoid_prime(x):
     return np.exp(-x) / ((np.exp(-x) + 1) ** 2)
@@ -20,6 +34,39 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
+# nowe, przyda się?
+def relu(x):
+    return np.maximum(x, x * 0.01)
+
+def relu_prime(x):
+    if x >= 0:
+        return 1
+    # ej nie jest tak xd
+    # a jak xd?
+    type(x) == no.ndarray
+    # no x to macierz xd
+    # np.exp jest przeładowane ale jakakoleiwk funkcja to chyba nie
+    # to co foreach ? :(
+    # właśnie nie wiem, a co z gpu?
+    # to miało być szybsze a nie xd
+    # mamy duzo mozliwosci zmian ale nie na raz trzeba ustalic jakos
+    # hm TODO gpu TODO wincyj procent TODO gui gotowe
+    # xd
+    # tamto myliło hah
+    # to co najpierw? :p
+    # ssh daje wglad do basha tylko tak ?
+    # nie, to jest taki fajny programik, byobu
+    # i ten pasek na dole też jest z byobu
+    # on udostepnia tylko basha ?
+    # tak, ale basha multiplayer xd
+    # szkoda że 2 kursorow nie ma
+    # hm
+
+    return 0.01 # chyba tak xd nikt nie widzial xd
+    # ale x to macierz :p
+# ale to jest przeciazone i jak jest funkcja od macierzy to bierze po kolei kazdy element
+# w sumie
+# zobacze na drugiej karcie xd
 #X = np.array([[0, 0],
 #              [0, 1],
 #              [1, 0],
@@ -44,7 +91,7 @@ y = np.array(y)
 np.random.seed(1)
 
 LEN = len(labels)
-SIZES = [ 784, 17, 16, 10 ]
+SIZES = [ 784, size_1, size_2, 10 ]
 
 syn0 = 2 * np.random.random((SIZES[0], SIZES[1])) - 1  
 syn1 = 2 * np.random.random((SIZES[1], SIZES[2])) - 1 
@@ -64,7 +111,7 @@ for i, batch in list(enumerate(images)):
 
     error = 1
     j = 0
-    while error > 0.05 and j < 50:
+    while j < batch_training_size:
         l0 = X
         l1 = sigmoid(np.dot(l0, syn0) + b0)
         l2 = sigmoid(np.dot(l1, syn1) + b1)
@@ -119,6 +166,7 @@ with open('log/' + str(datetime.now()), 'a') as f:
         print(myself.read(), file=f)
     print("", file=f)
     print("#### answers:", file=f)
+    print("argv =", sys.argv, file=f)
     print("correct_rate =", correct_rate, file=f)
     print("SIZES =", SIZES, file=f)
     print("syn0 =", syn0, file=f)
