@@ -3,11 +3,29 @@
 from __future__ import print_function # new print() on python2
 from datetime import datetime
 import sys
+import argparse
 import numpy as np  
 from mnist import MNIST
 from NeuralNetwork import Network
 
+def arguments():
+    parser = argparse.ArgumentParser(description='A simple neural network')
+    parser.add_argument('--layer', type=int, action='append',
+            help='add a layer with a given size to the network. Can be specified multiple times' +
+            'to create multiple layers.')
+
+    parser.add_argument('--batch-size', type=int, nargs=1,
+            help='batch size to use during training')
+
+    parser.add_argument('--batch-training-count', type=int, nargs=1,
+            help='how many times to use backpropagation on any given batch')
+
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    arguments = arguments()
+
     # Display full arrays
     np.set_printoptions(threshold=np.inf)
 
@@ -17,10 +35,10 @@ if __name__ == "__main__":
     labels = []
 
     # dynamic arguments
-    batch_size = int(sys.argv[1])
-    size_1 = int(sys.argv[2])
-    size_2 = int(sys.argv[3])
-    batch_training_size = int(sys.argv[4])
+    batch_size = arguments.batch_size[0]
+    batch_training_size = arguments.batch_training_count[0]
+    SIZES = [ 784 ] + arguments.layer + [ 10 ]
+    print(SIZES)
 
     data_part = 5 # only one fifth of the whole dataset to speed up training
 
@@ -37,9 +55,6 @@ if __name__ == "__main__":
 
     y = np.array(y)
 
-
-    LEN = len(labels)
-    SIZES = [ 784, size_1, size_2, 10 ]
 
     network = Network(SIZES)
 
