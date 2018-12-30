@@ -7,10 +7,10 @@
 #batch_training_size = sys.argv[4]
 
 while
-	batch_size=$((RANDOM % 80 + 50))
-	size_1=$((RANDOM % 20 + 20))
-	size_2=$((RANDOM % 15 + 20))
-	batch_training_size=$((RANDOM % 300 + 250))
+	batch_size=$((RANDOM % 90 + 10))
+	size_1=$((RANDOM % 40 + 10))
+	size_2=$((RANDOM % 40 + 10))
+	batch_training_size=$((RANDOM % 50 + 5))
 	./main.py $batch_size $size_1 $size_2 $batch_training_size
 do
 	sleep 1
