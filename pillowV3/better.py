@@ -33,46 +33,20 @@ def sigmoid_prime(x):
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
-
-# nowe, przyda się?
 def relu(x):
     return np.maximum(x, x * 0.01)
 
 def relu_prime(x):
     if x >= 0:
         return 1
-    # ej nie jest tak xd
-    # a jak xd?
-    type(x) == no.ndarray
-    # no x to macierz xd
-    # np.exp jest przeładowane ale jakakoleiwk funkcja to chyba nie
-    # to co foreach ? :(
-    # właśnie nie wiem, a co z gpu?
-    # to miało być szybsze a nie xd
-    # mamy duzo mozliwosci zmian ale nie na raz trzeba ustalic jakos
-    # hm TODO gpu TODO wincyj procent TODO gui gotowe
-    # xd
-    # tamto myliło hah
-    # to co najpierw? :p
-    # ssh daje wglad do basha tylko tak ?
-    # nie, to jest taki fajny programik, byobu
-    # i ten pasek na dole też jest z byobu
-    # on udostepnia tylko basha ?
-    # tak, ale basha multiplayer xd
-    # szkoda że 2 kursorow nie ma
-    # hm
+    return 0.01 
 
-    return 0.01 # chyba tak xd nikt nie widzial xd
-    # ale x to macierz :p
-# ale to jest przeciazone i jak jest funkcja od macierzy to bierze po kolei kazdy element
-# w sumie
-# zobacze na drugiej karcie xd
-#X = np.array([[0, 0],
-#              [0, 1],
-#              [1, 0],
-#              [1, 1]])
+X = np.array([[0, 0],
+              [0, 1],
+              [1, 0],
+              [1, 1]])
 
-#X = np.array(images)
+X = np.array(images)
 
 y = []
 
@@ -83,10 +57,10 @@ for batch in labels:
 
 y = np.array(y)
 
-#y = np.array([[0],
-#              [1],
-#              [1],
-#              [0]])
+y = np.array([[0],
+              [1],
+              [1],
+              [0]])
 
 np.random.seed(1)
 
